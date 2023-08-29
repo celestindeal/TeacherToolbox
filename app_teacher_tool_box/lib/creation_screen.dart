@@ -1,4 +1,5 @@
 import 'package:app_teacher_tool_box/models/Sudent.dart';
+import 'package:app_teacher_tool_box/utils/localDataManager.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
@@ -12,6 +13,7 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
   List<Student> students = [];
   List<Widget> studentFields = [];
   List<TextEditingController> studentFieldsControllers = [];
+  String className = '';
 
   @override
   void initState() {
@@ -33,6 +35,15 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 20),
+            TextField(
+              onChanged: (value) {
+                className = value;
+              },
+              decoration: InputDecoration(
+                labelText: 'Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
             Column(
               children: studentFields,
             ),
@@ -107,7 +118,7 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
     );
   }
 
-  void createStudentGroup() {
+  void createStudentGroup() async {
     students.clear();
 
     for (var i = 0; i < studentFieldsControllers.length; i += 2) {
@@ -120,8 +131,9 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
     }
 
     if (students.isNotEmpty) {
-      StudentGroup newStudentGroup = StudentGroup('Class Name', students);
+      StudentGroup newStudentGroup = StudentGroup(className, students);
       newStudentGroup.logDetails();
+      await LocalDataManager.saveStudentGroupLocally(newStudentGroup);
       Navigator.pop(context);
     }
   }

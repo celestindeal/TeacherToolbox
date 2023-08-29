@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Workshop Planner',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: const MaterialColor(
           0xFF008080, // Code RVB du bleu canard
