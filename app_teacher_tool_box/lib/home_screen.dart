@@ -1,6 +1,8 @@
-import 'package:app_teacher_tool_box/models/StudentGroup.dart';
-import 'package:app_teacher_tool_box/utils/localDataManager.dart';
+import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
+import 'package:app_teacher_tool_box/utils/localActivityManager.dart';
 import 'package:flutter/material.dart';
+import 'package:app_teacher_tool_box/models/StudentGroup.dart';
+import 'package:app_teacher_tool_box/utils/localStudentsManager.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -9,18 +11,23 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<StudentGroup> studentGroups = [];
+  List<ActivityGroup> activityGroups = []; // Liste des groupes d'activités
 
   @override
   void initState() {
     super.initState();
-    _loadStudentGroups();
+    _loadData();
   }
 
-  Future<void> _loadStudentGroups() async {
-    List<StudentGroup> loadedGroups =
+  Future<void> _loadData() async {
+    List<StudentGroup> loadedStudentGroups =
         await LocalDataManager.getStudentGroupsLocally();
+    List<ActivityGroup> loadedActivityGroups =
+        await ActivityDataManager.getActivityGroupsLocally();
+
     setState(() {
-      studentGroups = loadedGroups;
+      studentGroups = loadedStudentGroups;
+      activityGroups = loadedActivityGroups;
     });
   }
 
@@ -43,11 +50,19 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               child: Text('Go to Workshop'),
             ),
+            SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/create');
               },
               child: Text('Go to creation screen'),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/create_Activity');
+              },
+              child: Text('Go to creation Activity screen'),
             ),
             SizedBox(height: 20),
             Text(
@@ -68,11 +83,66 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   return ListTile(
                     title: Text(group.name),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    subtitle: Row(
                       children: [
-                        Text('Number of Students: ${group.students.length}'),
-                        Text('Students: $studentNames'),
+                        ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                LocalDataManager.removeStudentGroupLocally(
+                                    group);
+                              });
+                            },
+                            child: Text('Delete')),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Number of Students: ${group.students.length}'),
+                            Text('Students: $studentNames'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Activity Groups:', // Titre pour les groupes d'activités
+              style: TextStyle(fontSize: 20),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: activityGroups.length,
+                itemBuilder: (context, index) {
+                  ActivityGroup group = activityGroups[index];
+
+                  // Générer une liste de noms d'activités
+                  String activityNames = group.activities
+                      .map((activity) => activity.name)
+                      .join(', ');
+
+                  return ListTile(
+                    title: Text(group.name),
+                    subtitle: Row(
+                      children: [
+                        ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                ActivityDataManager.removeActivityGroupLocally(
+                                    group);
+                              });
+                            },
+                            child: Text('Delete')),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                'Number of Activities: ${group.activities.length}'),
+                            Text('Activities: $activityNames'),
+                          ],
+                        ),
                       ],
                     ),
                   );

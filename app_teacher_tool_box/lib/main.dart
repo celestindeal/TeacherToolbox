@@ -1,3 +1,4 @@
+import 'package:app_teacher_tool_box/creation_activity_screen.dart';
 import 'package:app_teacher_tool_box/home_screen.dart';
 import 'package:app_teacher_tool_box/workshop_screen.dart';
 import 'package:app_teacher_tool_box/creation_screen.dart';
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => HomeScreen(),
         '/workshop': (context) => WorkshopScreen(),
         '/create': (context) => ClassCreationScreen(),
+        '/create_Activity': (context) => ActivityCreationScreen(),
       },
     );
   }
