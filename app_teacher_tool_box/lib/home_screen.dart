@@ -1,5 +1,6 @@
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/utils/localActivityManager.dart';
+import 'package:app_teacher_tool_box/workshop_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 import 'package:app_teacher_tool_box/utils/localStudentsManager.dart';
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +48,15 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/workshop');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkshopScreen(
+                      studentGroups: studentGroups,
+                      activityGroups: activityGroups,
+                    ),
+                  ),
+                );
               },
               child: Text('Go to Workshop'),
             ),

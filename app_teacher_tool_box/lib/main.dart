@@ -34,7 +34,10 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => HomeScreen(),
-        '/workshop': (context) => WorkshopScreen(),
+        '/workshop': (context) => WorkshopScreen(
+              activityGroups: [],
+              studentGroups: [],
+            ),
         '/create': (context) => ClassCreationScreen(),
         '/create_Activity': (context) => ActivityCreationScreen(),
       },

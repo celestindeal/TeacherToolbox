@@ -2,6 +2,7 @@ import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/utils/localActivityManager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ActivityCreationScreen extends StatefulWidget {
   @override
@@ -70,13 +71,27 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
 
   void addActivityField() {
     TextEditingController activityNameController = TextEditingController();
+    TextEditingController studentCountController = TextEditingController();
+    TextEditingController isMandatoryController = TextEditingController();
+
     activityFieldsControllers.add(activityNameController);
-    activityFields
-        .add(buildActivityField(activityFields.length, activityNameController));
+    activityFieldsControllers.add(studentCountController);
+    activityFieldsControllers.add(isMandatoryController);
+
+    activityFields.add(buildActivityField(
+      activityFields.length,
+      activityNameController,
+      studentCountController,
+      isMandatoryController,
+    ));
   }
 
   Widget buildActivityField(
-      int activityIndex, TextEditingController controller) {
+    int activityIndex,
+    TextEditingController nameController,
+    TextEditingController studentCountController,
+    TextEditingController isMandatoryController,
+  ) {
     return Column(
       children: [
         SizedBox(height: 10),
@@ -85,14 +100,32 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
             Text('${activityIndex + 1} '),
             Expanded(
               child: TextField(
-                controller: controller,
+                controller: nameController,
                 decoration: InputDecoration(
                   labelText: 'Activity Name',
                   border: OutlineInputBorder(),
                 ),
               ),
             ),
-            // Add more fields for activity details if needed
+          ],
+        ),
+        SizedBox(height: 10),
+        Row(
+          children: [
+            Text('Student Count: '),
+            Expanded(
+              child: TextField(
+                controller: studentCountController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly
+                ], // Permet uniquement les chiffres
+                decoration: InputDecoration(
+                  labelText: 'Number of Students',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
           ],
         ),
       ],
@@ -102,18 +135,19 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
   void createActivityGroup() async {
     activities.clear();
 
-    for (var i = 0; i < activityFieldsControllers.length; i++) {
+    for (var i = 0; i < activityFieldsControllers.length; i += 3) {
       String activityName = activityFieldsControllers[i].text;
+      String studentCountText = activityFieldsControllers[i + 1].text;
 
-      if (activityName.isNotEmpty) {
-        activities.add(Activity(
-            activityName, true)); // You can adjust the parameters as needed
+      int studentCount = int.tryParse(studentCountText) ?? 0;
+
+      if (activityName.isNotEmpty && studentCount > 0) {
+        activities.add(Activity(activityName, studentCount, true));
       }
     }
 
     if (activities.isNotEmpty) {
       ActivityGroup newActivityGroup = ActivityGroup(groupName, activities);
-      // Save the new activity group using your data manager utility
       await ActivityDataManager.saveActivityGroupLocally(newActivityGroup);
       Navigator.pop(context);
     }

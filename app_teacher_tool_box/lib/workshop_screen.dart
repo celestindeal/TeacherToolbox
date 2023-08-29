@@ -1,15 +1,34 @@
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
+import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 import 'package:flutter/material.dart';
 
 class WorkshopScreen extends StatefulWidget {
+  final List<StudentGroup> studentGroups;
+  final List<ActivityGroup> activityGroups;
+
+  WorkshopScreen({
+    required this.studentGroups,
+    required this.activityGroups,
+  });
+
   @override
   _WorkshopScreenState createState() => _WorkshopScreenState();
 }
 
 class _WorkshopScreenState extends State<WorkshopScreen> {
-  List<ActivityGroup> activityGroups = []; // Liste des groupes d'activités
+  late StudentGroup selectedStudentGroup;
+  late ActivityGroup selectedActivityGroup;
 
-  final TextEditingController _groupNameController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    selectedStudentGroup = widget.studentGroups.isNotEmpty
+        ? widget.studentGroups.first
+        : StudentGroup('', []); // Remplacez les valeurs par défaut appropriées
+    selectedActivityGroup = widget.activityGroups.isNotEmpty
+        ? widget.activityGroups.first
+        : ActivityGroup('', []); // Remplacez les valeurs par défaut appropriées
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,49 +40,57 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Text(
-              'Create Activity Group',
+              'Select Student Group and Activity Group',
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 20),
-            TextField(
-              controller: _groupNameController,
-              decoration: InputDecoration(labelText: 'Group Name'),
+            DropdownButton<StudentGroup>(
+              value: selectedStudentGroup,
+              hint: Text('Select Student Group'),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedStudentGroup = newValue!;
+                });
+              },
+              items: widget.studentGroups.map<DropdownMenuItem<StudentGroup>>(
+                (StudentGroup group) {
+                  return DropdownMenuItem<StudentGroup>(
+                    value: group,
+                    child: Text(group.name),
+                  );
+                },
+              ).toList(),
+            ),
+            SizedBox(height: 20),
+            DropdownButton<ActivityGroup>(
+              value: selectedActivityGroup,
+              hint: Text('Select Activity Group'),
+              onChanged: (newValue) {
+                setState(() {
+                  selectedActivityGroup = newValue!;
+                });
+              },
+              items: widget.activityGroups.map<DropdownMenuItem<ActivityGroup>>(
+                (ActivityGroup group) {
+                  return DropdownMenuItem<ActivityGroup>(
+                    value: group,
+                    child: Text(group.name),
+                  );
+                },
+              ).toList(),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                createActivityGroup();
+                // Appeler votre algorithme ici et afficher le planning
+                // (code à ajouter)
               },
-              child: Text('Create Group'),
+              child: Text('Generate Workshop'),
             ),
-            // Display existing activity groups
-            if (activityGroups.isNotEmpty) ...[
-              SizedBox(height: 20),
-              Text(
-                'Existing Activity Groups:',
-                style: TextStyle(fontSize: 20),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: activityGroups.map((group) {
-                  return Text(group.name);
-                }).toList(),
-              ),
-            ],
+            // Affichage du planning (code à ajouter)
           ],
         ),
       ),
     );
-  }
-
-  void createActivityGroup() {
-    String groupName = _groupNameController.text;
-    if (groupName.isNotEmpty) {
-      ActivityGroup newGroup = ActivityGroup(groupName, []);
-      setState(() {
-        activityGroups.add(newGroup);
-      });
-      _groupNameController.clear();
-    }
   }
 }
