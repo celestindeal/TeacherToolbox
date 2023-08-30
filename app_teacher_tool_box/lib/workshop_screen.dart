@@ -1,5 +1,8 @@
+import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
+import 'package:app_teacher_tool_box/models/ScheduleGenerator.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
+import 'package:app_teacher_tool_box/models/Sudent.dart';
 import 'package:flutter/material.dart';
 
 class WorkshopScreen extends StatefulWidget {
@@ -18,16 +21,27 @@ class WorkshopScreen extends StatefulWidget {
 class _WorkshopScreenState extends State<WorkshopScreen> {
   late StudentGroup selectedStudentGroup;
   late ActivityGroup selectedActivityGroup;
+  Map<Activity, Map<int, List<Student>>> schedule = {};
 
   @override
   void initState() {
     super.initState();
     selectedStudentGroup = widget.studentGroups.isNotEmpty
         ? widget.studentGroups.first
-        : StudentGroup('', []); // Remplacez les valeurs par défaut appropriées
+        : StudentGroup('', []);
     selectedActivityGroup = widget.activityGroups.isNotEmpty
         ? widget.activityGroups.first
-        : ActivityGroup('', []); // Remplacez les valeurs par défaut appropriées
+        : ActivityGroup('', []);
+  }
+
+  int getMaxStates(Map<Activity, Map<int, List<Student>>> schedule) {
+    int maxStates = 0;
+    for (var activity in schedule.values) {
+      if (activity.keys.length > maxStates) {
+        maxStates = activity.keys.length;
+      }
+    }
+    return maxStates;
   }
 
   @override
@@ -82,12 +96,53 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Appeler votre algorithme ici et afficher le planning
-                // (code à ajouter)
+                ScheduleGenerator scheduleGenerator = ScheduleGenerator(
+                  selectedStudentGroup,
+                  selectedActivityGroup,
+                );
+                scheduleGenerator.generateSchedule();
+                setState(() {
+                  schedule = scheduleGenerator.schedule;
+                });
               },
               child: Text('Generate Workshop'),
             ),
-            // Affichage du planning (code à ajouter)
+            schedule.length != 0
+                ? Container(
+                    height: 300, // Adjust the height as per your needs
+                    child: Table(
+                      defaultColumnWidth: IntrinsicColumnWidth(),
+                      children: [
+                        TableRow(
+                          children: [
+                            TableCell(child: Text('Activity')),
+                            for (var i = 1; i <= getMaxStates(schedule); i++)
+                              TableCell(child: Text('State $i')),
+                          ],
+                        ),
+                        for (var activityEntry in schedule.entries)
+                          TableRow(
+                            children: [
+                              TableCell(child: Text(activityEntry.key.name)),
+                              for (var i = 1; i <= getMaxStates(schedule); i++)
+                                TableCell(
+                                  child: activityEntry.value.containsKey(i)
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: activityEntry.value[i]!
+                                              .map((student) => Text(
+                                                  '${student.firstName} ${student.lastName}'))
+                                              .toList(),
+                                        )
+                                      : Container(), // empty cell if state doesn't exist for activity
+                                ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  )
+                : Container()
           ],
         ),
       ),

@@ -1,6 +1,9 @@
+import 'package:app_teacher_tool_box/models/Activity.dart';
+
 class Student {
   final String firstName;
   final String lastName;
+  List<Activity> activities = [];
 
   Student(this.firstName, this.lastName);
 
