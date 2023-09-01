@@ -100,7 +100,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                   selectedStudentGroup,
                   selectedActivityGroup,
                 );
-                scheduleGenerator.generateSchedule();
+                scheduleGenerator.generateScheduleUsingSimulatedAnnealing();
                 setState(() {
                   schedule = scheduleGenerator.schedule;
                 });
