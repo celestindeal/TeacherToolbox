@@ -8,6 +8,10 @@ class StudentGroup {
   //constructeur
   StudentGroup(this.name, this.students);
 
+  Student getStudentById(int id) {
+    return students.firstWhere((student) => student.id == id);
+  }
+
   void logDetails() {
     print('Student Group Name: $name');
     print('Number of Students: ${students.length}');
@@ -33,5 +37,4 @@ class StudentGroup {
 
     return StudentGroup(json['name'], studentsList);
   }
-
 }

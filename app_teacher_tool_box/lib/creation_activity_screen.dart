@@ -142,7 +142,7 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
       int studentCount = int.tryParse(studentCountText) ?? 0;
 
       if (activityName.isNotEmpty && studentCount > 0) {
-        activities.add(Activity(activityName, studentCount, true));
+        activities.add(Activity(activityName, studentCount, true, i));
       }
     }
 

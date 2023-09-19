@@ -126,7 +126,7 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
       String lastName = studentFieldsControllers[i + 1].text;
 
       if (firstName.isNotEmpty && lastName.isNotEmpty) {
-        students.add(Student(firstName, lastName));
+        students.add(Student(firstName, lastName, i));
       }
     }
 

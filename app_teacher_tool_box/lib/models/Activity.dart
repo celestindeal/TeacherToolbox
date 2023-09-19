@@ -1,15 +1,17 @@
 class Activity {
+  final int id;
   final String name;
   final int number_students;
   final bool isMandatory;
 
-  Activity(this.name, this.number_students, this.isMandatory);
+  Activity(this.name, this.number_students, this.isMandatory, this.id);
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'number_students': number_students,
       'isMandatory': isMandatory,
+      'id': id,
     };
   }
 
@@ -20,6 +22,6 @@ class Activity {
     bool isMandatory =
         json.containsKey('isMandatory') ? json['isMandatory'] : false;
 
-    return Activity(name, numberStudents, isMandatory);
+    return Activity(name, numberStudents, isMandatory, json['id']);
   }
 }

@@ -21,7 +21,12 @@ class WorkshopScreen extends StatefulWidget {
 class _WorkshopScreenState extends State<WorkshopScreen> {
   late StudentGroup selectedStudentGroup;
   late ActivityGroup selectedActivityGroup;
-  Map<Activity, Map<int, List<Student>>> schedule = {};
+  // la première list est l'activity
+  // la deuxième list est les state
+  // la troisième list est les étudients
+  late List<List<List<int>>> planning = [
+    [[]]
+  ];
 
   @override
   void initState() {
@@ -96,53 +101,39 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                ScheduleGenerator scheduleGenerator = ScheduleGenerator(
-                  selectedStudentGroup,
-                  selectedActivityGroup,
-                );
-                scheduleGenerator.generateScheduleUsingSimulatedAnnealing();
+                ScheduleGenerator scheduleGenerator = ScheduleGenerator();
+                scheduleGenerator.generateForce(
+                    selectedStudentGroup, selectedActivityGroup);
                 setState(() {
-                  schedule = scheduleGenerator.schedule;
+                  planning = scheduleGenerator.planning;
                 });
               },
               child: Text('Generate Workshop'),
             ),
-            schedule.length != 0
-                ? Container(
-                    height: 300, // Adjust the height as per your needs
-                    child: Table(
-                      defaultColumnWidth: IntrinsicColumnWidth(),
-                      children: [
-                        TableRow(
-                          children: [
-                            TableCell(child: Text('Activity')),
-                            for (var i = 1; i <= getMaxStates(schedule); i++)
-                              TableCell(child: Text('State $i')),
-                          ],
-                        ),
-                        for (var activityEntry in schedule.entries)
-                          TableRow(
-                            children: [
-                              TableCell(child: Text(activityEntry.key.name)),
-                              for (var i = 1; i <= getMaxStates(schedule); i++)
-                                TableCell(
-                                  child: activityEntry.value.containsKey(i)
-                                      ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: activityEntry.value[i]!
-                                              .map((student) => Text(
-                                                  '${student.firstName} ${student.lastName}'))
-                                              .toList(),
-                                        )
-                                      : Container(), // empty cell if state doesn't exist for activity
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
-                  )
-                : Container()
+            planning.length == 1
+                ? Container()
+                : ListView.builder(
+                    itemCount: planning.length,
+                    itemBuilder: (context, activityIndex) {
+                      return ExpansionTile(
+                        title: Text('Activity ${activityIndex + 1}'),
+                        children: List.generate(planning[activityIndex].length,
+                            (stateIndex) {
+                          return ExpansionTile(
+                            title: Text('State ${stateIndex + 1}'),
+                            children: List.generate(
+                                planning[activityIndex][stateIndex].length,
+                                (studentIndex) {
+                              return ListTile(
+                                title: Text(
+                                    'Student ID: ${planning[activityIndex][stateIndex][studentIndex]}'),
+                              );
+                            }),
+                          );
+                        }),
+                      );
+                    },
+                  ),
           ],
         ),
       ),

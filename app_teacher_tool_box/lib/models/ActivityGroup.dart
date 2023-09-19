@@ -15,6 +15,10 @@ class ActivityGroup {
     }
   }
 
+  Activity getActivityById(int id) {
+    return activities.firstWhere((activity) => activity.id == id);
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'name': name,
