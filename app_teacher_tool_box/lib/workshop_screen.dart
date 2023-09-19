@@ -3,6 +3,7 @@ import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/models/ScheduleGenerator.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 import 'package:app_teacher_tool_box/models/Sudent.dart';
+import 'package:app_teacher_tool_box/utils/export.dart';
 import 'package:flutter/material.dart';
 
 class WorkshopScreen extends StatefulWidget {
@@ -112,26 +113,75 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
               child: planning.length == 0
                   ? Container()
                   : SingleChildScrollView(
-                      child: Table(
-                        border: TableBorder.all(color: Colors.grey),
-                        children: planning.map((activity) {
-                          return TableRow(
-                            children: activity.map((state) {
-                              return TableCell(
-                                child: Container(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: state.map((student) {
-                                      return Text(selectedStudentGroup
-                                          .getStudentById(student)
-                                          .lastName);
-                                    }).toList(),
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Table(
+                            border: TableBorder.all(color: Colors.grey),
+                            children: [
+                              // Titres des colonnes
+                              TableRow(
+                                children: [
+                                  TableCell(
+                                    // Cette cellule est vide pour laisser de l'espace pour les titres des lignes.
+                                    child: Container(),
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        }).toList(),
+                                  ...List.generate(
+                                      planning[0].length,
+                                      (index) => // Supposant que toutes les activités ont le même nombre d'états.
+                                          TableCell(
+                                            child: Container(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('State ${index + 1}',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)),
+                                            ),
+                                          )),
+                                ],
+                              ),
+                              // Lignes d'activités avec leurs titres
+                              ...planning.map((activity) {
+                                return TableRow(
+                                  children: [
+                                    // Titre de l'activité
+                                    TableCell(
+                                      child: Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Text(
+                                            ' ${selectedActivityGroup.getActivityById(planning.indexOf(activity)).name}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ),
+                                    // Cellules d'états pour l'activité
+                                    ...activity.map((state) {
+                                      return TableCell(
+                                        child: Container(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Column(
+                                            children: state.map((student) {
+                                              return Text(selectedStudentGroup
+                                                  .getStudentById(student)
+                                                  .lastName);
+                                              ;
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ],
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              generateExcel(planning);
+                            },
+                            child: Text("Export to Excel"),
+                          )
+                        ],
                       ),
                     ))
         ],

@@ -37,7 +37,10 @@ class GenerateurEmploiDuTemps {
 
       for (Student etudiant in groupeEtudiants.students) {
         // Tenter de placer l'étudiant dans une activité.
-        for (Activity activite in groupeActivites.activities) {
+        List<Activity> sortedActivities = List.from(groupeActivites.activities)
+          ..sort((a, b) => a.number_students.compareTo(b.number_students));
+
+        for (Activity activite in sortedActivities) {
           // Contrôler que l'étudiant n'a pas déjà participé à l'activité.
           // Qu'il reste de la place dans cette activité.
 
