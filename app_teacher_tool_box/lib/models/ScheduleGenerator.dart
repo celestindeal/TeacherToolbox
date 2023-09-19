@@ -5,56 +5,62 @@ import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 import 'package:app_teacher_tool_box/models/Sudent.dart';
 
-class ScheduleGenerator {
-  // la première list est l'activity
-  // la deuxième list est les state
-  // la troisième list est les étudients
-  late List<List<List<int>>> planning = [
-    [[]]
-  ];
+class GenerateurEmploiDuTemps {
+  // La première liste représente l'activité.
+  // La deuxième liste représente les stages.
+  // La troisième liste représente les étudiants.
+  late List<List<List<int>>> planning = [[]];
 
-  ScheduleGenerator();
+  GenerateurEmploiDuTemps();
 
-  void generateScheduleUsingSimulatedAnnealing() {}
+  void genererEmploiDuTempsAvecRecuitSimule() {
+    // L'implémentation du recuit simulé n'est pas fournie.
+  }
 
-  // générer un planning avec un liste d'étudiant et une liste d'activity
-  void generateForce(StudentGroup studentGroup, ActivityGroup activityGroup) {
+  // Générer un emploi du temps en utilisant la force brute.
+  void genererForce(
+      StudentGroup groupeEtudiants, ActivityGroup groupeActivites) {
     planning.clear();
     planning = List.generate(
-        activityGroup.activities.length, (index) => <List<int>>[]);
+        groupeActivites.activities.length, (index) => <List<int>>[]);
 
-    // on vas brut force state par state
-    // pour chaque state on doit mettre tous les étudients
-    int stateIndex = 0;
-    while (valideSolution(activityGroup, studentGroup) || stateIndex < 10) {
-      // on ajoute un state
+    int indexStage = 0;
+
+    // Continuer à générer la solution jusqu'à ce qu'une solution valide soit trouvée
+    // ou que l'indexEtat dépasse une limite prédéfinie.
+    while (
+        !solutionValide(groupeActivites, groupeEtudiants) && indexStage < 10) {
+      // Ajouter un nouvel état.
       planning.forEach((element) {
         element.add([]);
       });
-      // on doit mettre tous les étudients dans le state
-      for (Student student in studentGroup.students) {
-        // trouver une place pour l'étudient
-        for (Activity activity in activityGroup.activities) {
-          // si l'étudient n'est pas dans l'activity
-          if (!student.activities.contains(activity)) {
-            // si l'activity n'est pas dans le state
-            if (!planning[activity.id][stateIndex].contains(student.id)) {
-              // on ajoute l'étudient dans l'activity
-              planning[activity.id][stateIndex].add(student.id);
-              student.activities.add(activity);
-              break;
-            }
+
+      for (Student etudiant in groupeEtudiants.students) {
+        // Tenter de placer l'étudiant dans une activité.
+        for (Activity activite in groupeActivites.activities) {
+          // Contrôler que l'étudiant n'a pas déjà participé à l'activité.
+          // Qu'il reste de la place dans cette activité.
+
+          if (!etudiant.activities.contains(activite) &&
+              !planning[activite.id][indexStage].contains(etudiant.id) &&
+              activite.number_students >
+                  planning[activite.id][indexStage].length) {
+            // Attribuer l'étudiant à l'activité dans l'état actuel.
+            planning[activite.id][indexStage].add(etudiant.id);
+            etudiant.activities.add(activite);
+            break; // Arrêter après avoir attribué l'étudiant à une activité dans l'état actuel.
           }
         }
       }
-      stateIndex++;
+      indexStage++;
     }
   }
 
-  bool valideSolution(ActivityGroup activityGroup, StudentGroup studentGroup) {
-    // tous les etudients doivent avoir le bon nombre d'activity
-    for (Student student in studentGroup.students) {
-      if (student.activities.length != activityGroup.activities.length) {
+  bool solutionValide(
+      ActivityGroup groupeActivites, StudentGroup groupeEtudiants) {
+    // Chaque étudiant doit avoir participé à toutes les activités.
+    for (Student etudiant in groupeEtudiants.students) {
+      if (etudiant.activities.length != groupeActivites.activities.length) {
         return false;
       }
     }

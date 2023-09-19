@@ -24,9 +24,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   // la première list est l'activity
   // la deuxième list est les state
   // la troisième list est les étudients
-  late List<List<List<int>>> planning = [
-    [[]]
-  ];
+  late List<List<List<int>>> planning = [];
 
   @override
   void initState() {
@@ -53,89 +51,90 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Workshop')),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(
-              'Select Student Group and Activity Group',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 20),
-            DropdownButton<StudentGroup>(
-              value: selectedStudentGroup,
-              hint: Text('Select Student Group'),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedStudentGroup = newValue!;
-                });
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'Select Student Group and Activity Group',
+            style: TextStyle(fontSize: 24),
+          ),
+          SizedBox(height: 20),
+          DropdownButton<StudentGroup>(
+            value: selectedStudentGroup,
+            hint: Text('Select Student Group'),
+            onChanged: (newValue) {
+              setState(() {
+                selectedStudentGroup = newValue!;
+              });
+            },
+            items: widget.studentGroups.map<DropdownMenuItem<StudentGroup>>(
+              (StudentGroup group) {
+                return DropdownMenuItem<StudentGroup>(
+                  value: group,
+                  child: Text(group.name),
+                );
               },
-              items: widget.studentGroups.map<DropdownMenuItem<StudentGroup>>(
-                (StudentGroup group) {
-                  return DropdownMenuItem<StudentGroup>(
-                    value: group,
-                    child: Text(group.name),
-                  );
-                },
-              ).toList(),
-            ),
-            SizedBox(height: 20),
-            DropdownButton<ActivityGroup>(
-              value: selectedActivityGroup,
-              hint: Text('Select Activity Group'),
-              onChanged: (newValue) {
-                setState(() {
-                  selectedActivityGroup = newValue!;
-                });
+            ).toList(),
+          ),
+          SizedBox(height: 20),
+          DropdownButton<ActivityGroup>(
+            value: selectedActivityGroup,
+            hint: Text('Select Activity Group'),
+            onChanged: (newValue) {
+              setState(() {
+                selectedActivityGroup = newValue!;
+              });
+            },
+            items: widget.activityGroups.map<DropdownMenuItem<ActivityGroup>>(
+              (ActivityGroup group) {
+                return DropdownMenuItem<ActivityGroup>(
+                  value: group,
+                  child: Text(group.name),
+                );
               },
-              items: widget.activityGroups.map<DropdownMenuItem<ActivityGroup>>(
-                (ActivityGroup group) {
-                  return DropdownMenuItem<ActivityGroup>(
-                    value: group,
-                    child: Text(group.name),
-                  );
-                },
-              ).toList(),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                ScheduleGenerator scheduleGenerator = ScheduleGenerator();
-                scheduleGenerator.generateForce(
-                    selectedStudentGroup, selectedActivityGroup);
-                setState(() {
-                  planning = scheduleGenerator.planning;
-                });
-              },
-              child: Text('Generate Workshop'),
-            ),
-            planning.length == 1
-                ? Container()
-                : ListView.builder(
-                    itemCount: planning.length,
-                    itemBuilder: (context, activityIndex) {
-                      return ExpansionTile(
-                        title: Text('Activity ${activityIndex + 1}'),
-                        children: List.generate(planning[activityIndex].length,
-                            (stateIndex) {
-                          return ExpansionTile(
-                            title: Text('State ${stateIndex + 1}'),
-                            children: List.generate(
-                                planning[activityIndex][stateIndex].length,
-                                (studentIndex) {
-                              return ListTile(
-                                title: Text(
-                                    'Student ID: ${planning[activityIndex][stateIndex][studentIndex]}'),
+            ).toList(),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              GenerateurEmploiDuTemps scheduleGenerator =
+                  GenerateurEmploiDuTemps();
+              scheduleGenerator.genererForce(
+                  selectedStudentGroup, selectedActivityGroup);
+              print("Planning: ${scheduleGenerator.planning}");
+              setState(() {
+                planning = scheduleGenerator.planning;
+              });
+            },
+            child: Text('Generate Workshop'),
+          ),
+          Expanded(
+              child: planning.length == 0
+                  ? Container()
+                  : SingleChildScrollView(
+                      child: Table(
+                        border: TableBorder.all(color: Colors.grey),
+                        children: planning.map((activity) {
+                          return TableRow(
+                            children: activity.map((state) {
+                              return TableCell(
+                                child: Container(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: state.map((student) {
+                                      return Text(selectedStudentGroup
+                                          .getStudentById(student)
+                                          .lastName);
+                                    }).toList(),
+                                  ),
+                                ),
                               );
-                            }),
+                            }).toList(),
                           );
-                        }),
-                      );
-                    },
-                  ),
-          ],
-        ),
+                        }).toList(),
+                      ),
+                    ))
+        ],
       ),
     );
   }

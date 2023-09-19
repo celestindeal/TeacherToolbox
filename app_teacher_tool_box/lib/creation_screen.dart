@@ -120,13 +120,14 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
 
   void createStudentGroup() async {
     students.clear();
-
+    int index = 0;
     for (var i = 0; i < studentFieldsControllers.length; i += 2) {
       String firstName = studentFieldsControllers[i].text;
       String lastName = studentFieldsControllers[i + 1].text;
 
       if (firstName.isNotEmpty && lastName.isNotEmpty) {
-        students.add(Student(firstName, lastName, i));
+        students.add(Student(firstName, lastName, index));
+        index++;
       }
     }
 

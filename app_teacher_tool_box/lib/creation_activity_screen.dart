@@ -134,15 +134,16 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
 
   void createActivityGroup() async {
     activities.clear();
-
-    for (var i = 0; i < activityFieldsControllers.length; i += 3) {
+    int index = 0;
+    for (int i = 0; i < activityFieldsControllers.length; i += 3) {
       String activityName = activityFieldsControllers[i].text;
       String studentCountText = activityFieldsControllers[i + 1].text;
 
       int studentCount = int.tryParse(studentCountText) ?? 0;
 
       if (activityName.isNotEmpty && studentCount > 0) {
-        activities.add(Activity(activityName, studentCount, true, i));
+        activities.add(Activity(activityName, studentCount, true, index));
+        index++;
       }
     }
 
