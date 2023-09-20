@@ -1,50 +1,57 @@
 import 'dart:io';
-
 import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
-import 'package:excel/excel.dart';
-import 'dart:typed_data';
-
-import 'package:file_saver/file_saver.dart'; // Pour Uint8List
-import 'package:file_saver/file_saver.dart';
+import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 import 'package:path_provider/path_provider.dart';
 
-void generateExcel(List<List<List<int>>> planning, ActivityGroup activityGroup,
-    StudentGroup studentGroups) async {
-  var excel = Excel.createExcel();
-  var sheet = excel['Planning'];
+Future<void> generateExcel(List<List<List<int>>> planning,
+    ActivityGroup activityGroup, StudentGroup studentGroups) async {
+  final Workbook workbook = Workbook();
+  final Worksheet sheet = workbook.worksheets[0];
 
   // Ajouter les titres
-  var rowIndex = 0;
+  var rowIndex = 1; // Dans xlsio, l'indexation commence à 1
   var titles = ['Activity'];
   for (int i = 0; i < planning[0].length; i++) {
     titles.add('State ${i + 1}');
   }
 
-  sheet.appendRow(titles);
+  for (int i = 0; i < titles.length; i++) {
+    sheet.getRangeByIndex(rowIndex, i + 1).setText(titles[i]);
+  }
 
   // Ajouter les données
   for (var activity in planning) {
     rowIndex++;
-    var row = ['Activity $rowIndex'];
+    sheet.getRangeByIndex(rowIndex, 1).setText('Activity ${rowIndex - 1}');
+    int colIndex = 2; // Car la première colonne est pour 'Activity'
+
     for (var state in activity) {
+      int maxSizeCol = 0; // Pour ajuster la largeur de la colonne
       List<String> stateString = [];
       for (int id in state) {
         stateString.add(
             "${studentGroups.getStudentById(id).lastName} ${studentGroups.getStudentById(id).firstName}");
+        if (stateString.last.length > maxSizeCol) {
+          // Pour ajuster la largeur de la colonne
+          maxSizeCol = stateString.last.length;
+        }
       }
-      row.add(stateString.join("\n"));
+      sheet.getRangeByIndex(rowIndex, colIndex).setText(stateString.join("\n"));
+      if (sheet.getColumnWidth(colIndex) < 10 * maxSizeCol) {
+        // Pour ajuster la largeur de la colonne
+        sheet.setColumnWidthInPixels(colIndex, 10 * maxSizeCol);
+      }
+      colIndex++;
     }
-    sheet.appendRow(row);
   }
-  excel.delete('Sheet1');
-  List<int>? data = excel.encode();
-  if (data == null) throw Exception('Failed to generate Excel file');
+
+  final List<int> bytes = workbook.saveAsStream();
+  workbook.dispose();
 
   final directory = await getApplicationDocumentsDirectory();
-  String path = directory.path;
-
+  final path = directory.path;
   final file = File('$path/Planning.xlsx');
-  file.writeAsBytes(data);
+  await file.writeAsBytes(bytes);
 }

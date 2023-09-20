@@ -31,7 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.0.0
-  excel: 2.1.0
+  syncfusion_flutter_xlsio: ^23.1.36
   file_saver: ^0.2.8
   path_provider: ^2.1.1
 
