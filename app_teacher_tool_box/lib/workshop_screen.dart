@@ -102,12 +102,11 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                   GenerateurEmploiDuTemps();
               scheduleGenerator.genererForce(
                   selectedStudentGroup, selectedActivityGroup);
-              print("Planning: ${scheduleGenerator.planning}");
               setState(() {
                 planning = scheduleGenerator.planning;
               });
             },
-            child: Text('Generate Workshop'),
+            child: const Text('Generate Workshop'),
           ),
           Expanded(
               child: planning.length == 0
@@ -131,9 +130,10 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                                       (index) => // Supposant que toutes les activités ont le même nombre d'états.
                                           TableCell(
                                             child: Container(
-                                              padding: EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Text('State ${index + 1}',
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold)),
                                             ),
@@ -150,7 +150,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                                         padding: EdgeInsets.all(8.0),
                                         child: Text(
                                             ' ${selectedActivityGroup.getActivityById(planning.indexOf(activity)).name}',
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                       ),
                                     ),
@@ -161,9 +161,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                                           padding: EdgeInsets.all(8.0),
                                           child: Column(
                                             children: state.map((student) {
-                                              return Text(selectedStudentGroup
-                                                  .getStudentById(student)
-                                                  .lastName);
+                                              return Text(
+                                                  '${selectedStudentGroup.getStudentById(student).firstName} ${selectedStudentGroup.getStudentById(student).lastName}');
                                               ;
                                             }).toList(),
                                           ),
@@ -177,7 +176,8 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
                           ),
                           ElevatedButton(
                             onPressed: () async {
-                              generateExcel(planning);
+                              generateExcel(planning, selectedActivityGroup,
+                                  selectedStudentGroup);
                             },
                             child: Text("Export to Excel"),
                           )

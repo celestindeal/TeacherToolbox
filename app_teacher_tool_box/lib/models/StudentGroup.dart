@@ -1,5 +1,6 @@
+// ignore_for_file: file_names
+
 import 'package:app_teacher_tool_box/models/Sudent.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class StudentGroup {
   final String name;

@@ -1,4 +1,4 @@
-import 'dart:math';
+// ignore_for_file: file_names
 
 import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
@@ -31,9 +31,9 @@ class GenerateurEmploiDuTemps {
     while (
         !solutionValide(groupeActivites, groupeEtudiants) && indexStage < 10) {
       // Ajouter un nouvel état.
-      planning.forEach((element) {
+      for (var element in planning) {
         element.add([]);
-      });
+      }
 
       for (Student etudiant in groupeEtudiants.students) {
         // Tenter de placer l'étudiant dans une activité.
