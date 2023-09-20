@@ -22,6 +22,8 @@ class WorkshopScreen extends StatefulWidget {
 class _WorkshopScreenState extends State<WorkshopScreen> {
   late StudentGroup selectedStudentGroup;
   late ActivityGroup selectedActivityGroup;
+  late StudentGroup studentGroupPlanning;
+  late ActivityGroup activityGroupPlanning;
   // la première list est l'activity
   // la deuxième list est les state
   // la troisième list est les étudients
@@ -51,140 +53,150 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Workshop')),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            'Select Student Group and Activity Group',
-            style: TextStyle(fontSize: 24),
-          ),
-          SizedBox(height: 20),
-          DropdownButton<StudentGroup>(
-            value: selectedStudentGroup,
-            hint: Text('Select Student Group'),
-            onChanged: (newValue) {
-              setState(() {
-                selectedStudentGroup = newValue!;
-              });
-            },
-            items: widget.studentGroups.map<DropdownMenuItem<StudentGroup>>(
-              (StudentGroup group) {
-                return DropdownMenuItem<StudentGroup>(
-                  value: group,
-                  child: Text(group.name),
-                );
+      appBar: AppBar(title: const Text('Emploi du temps')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Text(
+              'Selectionner une classe et un groupe d\'activité',
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            DropdownButton<StudentGroup>(
+              value: selectedStudentGroup,
+              onChanged: (newValue) {
+                setState(() {
+                  selectedStudentGroup = newValue!;
+                });
               },
-            ).toList(),
-          ),
-          SizedBox(height: 20),
-          DropdownButton<ActivityGroup>(
-            value: selectedActivityGroup,
-            hint: Text('Select Activity Group'),
-            onChanged: (newValue) {
-              setState(() {
-                selectedActivityGroup = newValue!;
-              });
-            },
-            items: widget.activityGroups.map<DropdownMenuItem<ActivityGroup>>(
-              (ActivityGroup group) {
-                return DropdownMenuItem<ActivityGroup>(
-                  value: group,
-                  child: Text(group.name),
-                );
+              items: widget.studentGroups.map<DropdownMenuItem<StudentGroup>>(
+                (StudentGroup group) {
+                  return DropdownMenuItem<StudentGroup>(
+                    value: group,
+                    child: Text(group.name),
+                  );
+                },
+              ).toList(),
+            ),
+            SizedBox(height: 20),
+            DropdownButton<ActivityGroup>(
+              value: selectedActivityGroup,
+              onChanged: (newValue) {
+                setState(() {
+                  selectedActivityGroup = newValue!;
+                });
               },
-            ).toList(),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              GenerateurEmploiDuTemps scheduleGenerator =
-                  GenerateurEmploiDuTemps();
-              scheduleGenerator.genererForce(
-                  selectedStudentGroup, selectedActivityGroup);
-              setState(() {
-                planning = scheduleGenerator.planning;
-              });
-            },
-            child: const Text('Generate Workshop'),
-          ),
-          Expanded(
-              child: planning.length == 0
-                  ? Container()
-                  : SingleChildScrollView(
-                      padding: EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Table(
-                            border: TableBorder.all(color: Colors.grey),
-                            children: [
-                              // Titres des colonnes
-                              TableRow(
-                                children: [
-                                  TableCell(
-                                    // Cette cellule est vide pour laisser de l'espace pour les titres des lignes.
-                                    child: Container(),
-                                  ),
-                                  ...List.generate(
-                                      planning[0].length,
-                                      (index) => // Supposant que toutes les activités ont le même nombre d'états.
-                                          TableCell(
-                                            child: Container(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Text('State ${index + 1}',
-                                                  style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold)),
-                                            ),
-                                          )),
-                                ],
-                              ),
-                              // Lignes d'activités avec leurs titres
-                              ...planning.map((activity) {
-                                return TableRow(
+              items: widget.activityGroups.map<DropdownMenuItem<ActivityGroup>>(
+                (ActivityGroup group) {
+                  return DropdownMenuItem<ActivityGroup>(
+                    value: group,
+                    child: Text(group.name),
+                  );
+                },
+              ).toList(),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                if (planning.isEmpty ||
+                    selectedStudentGroup != studentGroupPlanning ||
+                    selectedActivityGroup != activityGroupPlanning) {
+                  planning.clear();
+                  studentGroupPlanning = selectedStudentGroup;
+                  activityGroupPlanning = selectedActivityGroup;
+                  GenerateurEmploiDuTemps scheduleGenerator =
+                      GenerateurEmploiDuTemps();
+                  scheduleGenerator.genererForce(
+                      studentGroupPlanning, activityGroupPlanning);
+                  setState(() {
+                    planning = scheduleGenerator.planning;
+                  });
+                }
+              },
+              child: const Text('Créer le planning'),
+            ),
+            Expanded(
+                child: planning.length == 0
+                    ? Container()
+                    : SingleChildScrollView(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            Table(
+                              border: TableBorder.all(color: Colors.grey),
+                              children: [
+                                // Titres des colonnes
+                                TableRow(
                                   children: [
-                                    // Titre de l'activité
                                     TableCell(
-                                      child: Container(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                            ' ${selectedActivityGroup.getActivityById(planning.indexOf(activity)).name}',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                      ),
+                                      // Cette cellule est vide pour laisser de l'espace pour les titres des lignes.
+                                      child: Container(),
                                     ),
-                                    // Cellules d'états pour l'activité
-                                    ...activity.map((state) {
-                                      return TableCell(
+                                    ...List.generate(
+                                        planning[0].length,
+                                        (index) => // Supposant que toutes les activités ont le même nombre d'états.
+                                            TableCell(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                    'State ${index + 1}',
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                              ),
+                                            )),
+                                  ],
+                                ),
+                                // Lignes d'activités avec leurs titres
+                                ...planning.map((activity) {
+                                  return TableRow(
+                                    children: [
+                                      // Titre de l'activité
+                                      TableCell(
                                         child: Container(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Column(
-                                            children: state.map((student) {
-                                              return Text(
-                                                  '${selectedStudentGroup.getStudentById(student).firstName} ${selectedStudentGroup.getStudentById(student).lastName}');
-                                              ;
-                                            }).toList(),
-                                          ),
+                                          child: Text(
+                                              ' ${activityGroupPlanning.getActivityById(planning.indexOf(activity)).name}',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold)),
                                         ),
-                                      );
-                                    }).toList(),
-                                  ],
-                                );
-                              }).toList(),
-                            ],
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              generateExcel(planning, selectedActivityGroup,
-                                  selectedStudentGroup);
-                            },
-                            child: Text("Export to Excel"),
-                          )
-                        ],
-                      ),
-                    ))
-        ],
+                                      ),
+                                      // Cellules d'états pour l'activité
+                                      ...activity.map((state) {
+                                        return TableCell(
+                                          child: Container(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Column(
+                                              children: state.map((student) {
+                                                return Text(
+                                                    '${studentGroupPlanning.getStudentById(student).firstName} ${studentGroupPlanning.getStudentById(student).lastName}');
+                                                ;
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                  );
+                                }).toList(),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: () async {
+                                generateExcel(planning, selectedActivityGroup,
+                                    selectedStudentGroup);
+                              },
+                              child: Text("Générer un Excel"),
+                            )
+                          ],
+                        ),
+                      ))
+          ],
+        ),
       ),
     );
   }

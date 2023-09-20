@@ -32,51 +32,50 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Home')),
+      appBar: AppBar(title: Text('Boite à outils de l\'enseignant')),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Text(
-              'Welcome to Workshop Planner!',
-              style: TextStyle(fontSize: 24),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/create');
+                  },
+                  child: Text('Créer un groupe d\'étudiants'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WorkshopScreen(
+                          studentGroups: studentGroups,
+                          activityGroups: activityGroups,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Générer un emploi du temps',
+                      style: TextStyle(fontSize: 20)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/create_Activity');
+                  },
+                  child: Text('Créer un groupe d\'activités'),
+                ),
+              ],
             ),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WorkshopScreen(
-                      studentGroups: studentGroups,
-                      activityGroups: activityGroups,
-                    ),
-                  ),
-                );
-              },
-              child: Text('Go to Workshop'),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/create');
-              },
-              child: Text('Go to creation screen'),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/create_Activity');
-              },
-              child: Text('Go to creation Activity screen'),
-            ),
-            SizedBox(height: 20),
             Text(
-              'Student Groups:',
+              'Liste des groupes d\'étudiants :',
               style: TextStyle(fontSize: 20),
             ),
             Expanded(
@@ -86,32 +85,49 @@ class _HomeScreenState extends State<HomeScreen> {
                   StudentGroup group = studentGroups[index];
 
                   // Génère une liste de noms et prénoms des étudiants
-                  String studentNames = group.students
+                  List<String> studentNamesList = group.students
                       .map((student) =>
                           '${student.firstName} ${student.lastName}')
-                      .join(', ');
+                      .toList();
 
-                  return ListTile(
-                    title: Text(group.name),
-                    subtitle: Row(
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                LocalDataManager.removeStudentGroupLocally(
-                                    group);
-                              });
-                            },
-                            child: Text('Delete')),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Number of Students: ${group.students.length}'),
-                            Text('Students: $studentNames'),
-                          ],
+                  String displayNames;
+                  if (studentNamesList.length <= 3) {
+                    displayNames = studentNamesList.join(', ');
+                  } else {
+                    displayNames =
+                        studentNamesList.sublist(0, 3).join(', ') + '...';
+                  }
+
+                  return Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                    elevation: 5.0,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(15.0),
+                      title: Text(group.name,
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              'Nombre d\'étudiant(s): ${group.students.length}'),
+                          SizedBox(height: 5),
+                          Text('Etudiant : $displayNames'),
+                        ],
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            LocalDataManager.removeStudentGroupLocally(group);
+                          });
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.red),
                         ),
-                      ],
+                        child: Text('Supprimer',
+                            style: TextStyle(color: Colors.white)),
+                      ),
                     ),
                   );
                 },
@@ -119,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: 20),
             Text(
-              'Activity Groups:', // Titre pour les groupes d'activités
+              'Liste d\'activitées :', // Titre pour les groupes d'activités
               style: TextStyle(fontSize: 20),
             ),
             Expanded(
@@ -129,31 +145,49 @@ class _HomeScreenState extends State<HomeScreen> {
                   ActivityGroup group = activityGroups[index];
 
                   // Générer une liste de noms d'activités
-                  String activityNames = group.activities
+                  List<String> activityNamesList = group.activities
                       .map((activity) => activity.name)
-                      .join(', ');
+                      .toList();
 
-                  return ListTile(
-                    title: Text(group.name),
-                    subtitle: Row(
-                      children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                ActivityDataManager.removeActivityGroupLocally(
-                                    group);
-                              });
-                            },
-                            child: Text('Delete')),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                'Number of Activities: ${group.activities.length}'),
-                            Text('Activities: $activityNames'),
-                          ],
+                  String displayNames;
+                  if (activityNamesList.length <= 3) {
+                    displayNames = activityNamesList.join(', ');
+                  } else {
+                    displayNames =
+                        activityNamesList.sublist(0, 3).join(', ') + '...';
+                  }
+
+                  return Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+                    elevation: 5.0,
+                    child: ListTile(
+                      contentPadding: EdgeInsets.all(15.0),
+                      title: Text(group.name,
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              'Nombre d\'activitée (s) : ${group.activities.length}'),
+                          SizedBox(height: 5),
+                          Text('Activitée (s) : $displayNames'),
+                        ],
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            ActivityDataManager.removeActivityGroupLocally(
+                                group);
+                          });
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.red),
                         ),
-                      ],
+                        child: Text('Supprimer',
+                            style: TextStyle(color: Colors.white)),
+                      ),
                     ),
                   );
                 },

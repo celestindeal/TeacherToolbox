@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Workshop Planner',
+      title: 'Boite à outils de l\'enseignant',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: const MaterialColor(
