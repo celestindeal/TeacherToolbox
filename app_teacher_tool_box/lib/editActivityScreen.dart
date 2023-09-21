@@ -1,33 +1,33 @@
-import 'package:app_teacher_tool_box/models/Sudent.dart';
-import 'package:app_teacher_tool_box/utils/localStudentsManager.dart';
+import 'package:app_teacher_tool_box/models/Activity.dart';
+import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
+import 'package:app_teacher_tool_box/utils/localActivityManager.dart';
 import 'package:flutter/material.dart';
-import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 
-class EditClassScreen extends StatefulWidget {
-  final StudentGroup studentGroup;
+class EditActivityScreen extends StatefulWidget {
+  ActivityGroup activityGroup;
 
-  EditClassScreen({required this.studentGroup});
+  EditActivityScreen({required this.activityGroup});
 
   @override
-  _EditClassScreenState createState() => _EditClassScreenState();
+  _EditActivityScreenState createState() => _EditActivityScreenState();
 }
 
-class _EditClassScreenState extends State<EditClassScreen> {
+class _EditActivityScreenState extends State<EditActivityScreen> {
   late TextEditingController classNameController;
-  List<TextEditingController> studentFirstNameControllers = [];
-  List<TextEditingController> studentLastNameControllers = [];
+  List<TextEditingController> activityNameControllers = [];
+  List<TextEditingController> activityNbStudentsControllers = [];
   String lastName = '';
 
   @override
   void initState() {
     super.initState();
-    classNameController = TextEditingController(text: widget.studentGroup.name);
-    lastName = widget.studentGroup.name;
-    for (var student in widget.studentGroup.students) {
-      studentFirstNameControllers
-          .add(TextEditingController(text: student.firstName));
-      studentLastNameControllers
-          .add(TextEditingController(text: student.lastName));
+    classNameController =
+        TextEditingController(text: widget.activityGroup.name);
+    lastName = widget.activityGroup.name;
+    for (var activities in widget.activityGroup.activities) {
+      activityNameControllers.add(TextEditingController(text: activities.name));
+      activityNbStudentsControllers.add(
+          TextEditingController(text: activities.number_students.toString()));
     }
   }
 
@@ -35,10 +35,10 @@ class _EditClassScreenState extends State<EditClassScreen> {
   void dispose() {
     // nétoyer et libérer la mémoire
     classNameController.dispose();
-    for (var controller in studentFirstNameControllers) {
+    for (var controller in activityNameControllers) {
       controller.dispose();
     }
-    for (var controller in studentLastNameControllers) {
+    for (var controller in activityNbStudentsControllers) {
       controller.dispose();
     }
     super.dispose();
@@ -47,7 +47,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Modifier une classe')),
+      appBar: AppBar(title: const Text('Modifier l\'activité')),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -56,7 +56,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
             TextField(
               controller: classNameController,
               onChanged: (value) {
-                widget.studentGroup.name = value;
+                widget.activityGroup.name = value;
               },
               decoration: InputDecoration(
                 labelText: 'Name',
@@ -70,15 +70,14 @@ class _EditClassScreenState extends State<EditClassScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Add a new student
                 setState(() {
-                  widget.studentGroup.students.add(
-                      Student('', '', widget.studentGroup.students.length));
-                  studentFirstNameControllers.add(TextEditingController());
-                  studentLastNameControllers.add(TextEditingController());
+                  widget.activityGroup.activities.add(Activity(
+                      '', 0, true, widget.activityGroup.activities.length));
+                  activityNameControllers.add(TextEditingController());
+                  activityNbStudentsControllers.add(TextEditingController());
                 });
               },
-              child: Text('Ajouter un élève'),
+              child: Text('Ajouter une activité'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -96,7 +95,7 @@ class _EditClassScreenState extends State<EditClassScreen> {
 
   List<Widget> buildStudentFields() {
     List<Widget> fields = [];
-    for (int i = 0; i < studentFirstNameControllers.length; i++) {
+    for (int i = 0; i < activityNameControllers.length; i++) {
       fields.add(buildStudentField(i));
     }
     return fields;
@@ -113,10 +112,10 @@ class _EditClassScreenState extends State<EditClassScreen> {
                 width: 10), // Espacement entre le numéro et le champ de prénom
             Expanded(
               child: TextField(
-                controller: studentFirstNameControllers[index],
+                controller: activityNameControllers[index],
                 onChanged: (value) {
                   // Update the corresponding student's first name
-                  widget.studentGroup.students[index].firstName = value;
+                  widget.activityGroup.activities[index].name = value;
                 },
                 decoration: InputDecoration(
                   labelText: 'Nom',
@@ -128,13 +127,15 @@ class _EditClassScreenState extends State<EditClassScreen> {
                 width: 10), // Espacement entre les champs de prénom et de nom
             Expanded(
               child: TextField(
-                controller: studentLastNameControllers[index],
+                keyboardType: TextInputType.number,
+                controller: activityNbStudentsControllers[index],
                 onChanged: (value) {
                   // Update the corresponding student's last name
-                  widget.studentGroup.students[index].lastName = value;
+                  widget.activityGroup.activities[index].number_students =
+                      int.parse(value);
                 },
                 decoration: InputDecoration(
-                  labelText: 'Prénom',
+                  labelText: 'Nombre d\'élèves',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -143,10 +144,9 @@ class _EditClassScreenState extends State<EditClassScreen> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  widget.studentGroup.students
-                      .removeAt(index); // Supprimez l'élève du groupe d'élèves
-                  studentFirstNameControllers.removeAt(index);
-                  studentLastNameControllers.removeAt(index);
+                  widget.activityGroup.activities.removeAt(index);
+                  activityNameControllers.removeAt(index);
+                  activityNbStudentsControllers.removeAt(index);
                 });
               },
               style: ButtonStyle(
@@ -161,7 +161,8 @@ class _EditClassScreenState extends State<EditClassScreen> {
   }
 
   void saveChanges(String lastName) {
-    StudentDataManager.updateStudentGroupLocally(widget.studentGroup, lastName);
-    Navigator.pop(context, widget.studentGroup);
+    ActivityDataManager.updateActivityGroupLocally(
+        widget.activityGroup, lastName);
+    Navigator.pop(context, widget.activityGroup);
   }
 }

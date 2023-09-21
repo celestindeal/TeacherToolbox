@@ -24,7 +24,9 @@ Future<void> generateExcel(List<List<List<int>>> planning,
   // Add data
   for (var activity in planning) {
     rowIndex++;
-    sheet.getRangeByIndex(rowIndex, 1).setText('Activity ${rowIndex - 1}');
+    sheet
+        .getRangeByIndex(rowIndex, 1)
+        .setText(activityGroup.getActivityById(rowIndex - 2).name);
     int colIndex = 2;
 
     for (var state in activity) {

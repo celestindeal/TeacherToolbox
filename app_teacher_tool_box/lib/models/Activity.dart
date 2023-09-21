@@ -1,7 +1,7 @@
 class Activity {
   final int id;
-  final String name;
-  final int number_students;
+  String name;
+  int number_students;
   final bool isMandatory;
 
   Activity(this.name, this.number_students, this.isMandatory, this.id);

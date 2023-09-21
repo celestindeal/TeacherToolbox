@@ -72,4 +72,26 @@ class ActivityDataManager {
         existingActivityGroups.map((group) => group.toJson()).toList();
     await prefs.setString('activityGroups', jsonEncode(activityGroupsJson));
   }
+
+  static Future<void> updateActivityGroupLocally(
+      ActivityGroup updatedActivityGroup, String lastName) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<ActivityGroup> existingActivityGroups =
+        await getActivityGroupsLocally();
+
+    // Recherchez l'index du groupe d'étudiants à mettre à jour
+    int groupIndex =
+        existingActivityGroups.indexWhere((group) => group.name == lastName);
+    print(groupIndex);
+    if (groupIndex != -1) {
+      // Mettez à jour le groupe d'étudiants dans la liste
+      existingActivityGroups[groupIndex] = updatedActivityGroup;
+
+      // Enregistrez la liste mise à jour localement
+      final activityGroupsJson =
+          existingActivityGroups.map((group) => group.toJson()).toList();
+      print(activityGroupsJson);
+      await prefs.setString('activityGroups', jsonEncode(activityGroupsJson));
+    }
+  }
 }

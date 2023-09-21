@@ -31,10 +31,12 @@ class StudentGroup {
   }
 
   // Méthode de désérialisation
-  factory StudentGroup.fromJson(Map<String, dynamic> json) {
-    final studentsList = (json['students'] as List).map((studentJson) {
-      return Student.fromJson(studentJson);
-    }).toList();
+  static StudentGroup fromJson(Map<String, dynamic> json) {
+    final List<Student> studentsList =
+        (json['students'] as List?)?.map((studentJson) {
+              return Student.fromJson(studentJson);
+            }).toList() ??
+            []; // Utiliser une liste vide par défaut si 'students' est nul.
 
     return StudentGroup(json['name'], studentsList);
   }

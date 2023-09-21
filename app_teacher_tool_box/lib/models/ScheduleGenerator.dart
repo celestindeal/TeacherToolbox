@@ -9,22 +9,26 @@ class GenerateurEmploiDuTemps {
   // La première liste représente l'activité.
   // La deuxième liste représente les stages.
   // La troisième liste représente les étudiants.
-  late List<List<List<int>>> planning = [[]];
+  // List<List<List<int>>> planning = [];
 
-  GenerateurEmploiDuTemps();
-
-  void genererEmploiDuTempsAvecRecuitSimule() {
+  // Rendez la classe GenerateurEmploiDuTemps statique.
+  static void genererEmploiDuTempsAvecRecuitSimule() {
     // L'implémentation du recuit simulé n'est pas fournie.
   }
 
   // Générer un emploi du temps en utilisant la force brute.
-  void genererForce(
+  static List<List<List<int>>> genererForce(
       StudentGroup groupeEtudiants, ActivityGroup groupeActivites) {
-    planning.clear();
+    List<List<List<int>>> planning = [[]];
     planning = List.generate(
         groupeActivites.activities.length, (index) => <List<int>>[]);
 
     int indexStage = 0;
+
+    // Init la liste activité des etudients
+    for (Student etudiant in groupeEtudiants.students) {
+      etudiant.activities = [];
+    }
 
     // Continuer à générer la solution jusqu'à ce qu'une solution valide soit trouvée
     // ou que l'indexEtat dépasse une limite prédéfinie.
@@ -57,9 +61,10 @@ class GenerateurEmploiDuTemps {
       }
       indexStage++;
     }
+    return planning;
   }
 
-  bool solutionValide(
+  static bool solutionValide(
       ActivityGroup groupeActivites, StudentGroup groupeEtudiants) {
     // Chaque étudiant doit avoir participé à toutes les activités.
     for (Student etudiant in groupeEtudiants.students) {

@@ -24,23 +24,18 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Class Creation')),
+      appBar: AppBar(title: Text('Créer une classe')),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              'Create a Class',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 20),
             TextField(
               onChanged: (value) {
                 className = value;
               },
               decoration: InputDecoration(
-                labelText: 'Name',
+                labelText: 'Nom de la classe',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -54,14 +49,14 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
                   addStudentField();
                 });
               },
-              child: Text('Add Student'),
+              child: Text('Ajouter un élève'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 createStudentGroup();
               },
-              child: Text('Create Class'),
+              child: Text('Créer la classe'),
             ),
           ],
         ),
@@ -97,7 +92,7 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
               child: TextField(
                 controller: firstNameController,
                 decoration: InputDecoration(
-                  labelText: 'First Name',
+                  labelText: 'Nom',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -107,7 +102,7 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
               child: TextField(
                 controller: lastNameController,
                 decoration: InputDecoration(
-                  labelText: 'Last Name',
+                  labelText: 'Prénom',
                   border: OutlineInputBorder(),
                 ),
               ),

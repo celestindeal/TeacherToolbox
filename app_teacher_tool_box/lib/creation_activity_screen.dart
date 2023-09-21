@@ -24,23 +24,20 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Activity Creation')),
+      appBar: AppBar(
+        title: const Text('Créer une liste d\'activités'),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              'Create an Activity Group',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 20),
             TextField(
               onChanged: (value) {
                 groupName = value;
               },
               decoration: InputDecoration(
-                labelText: 'Group Name',
+                labelText: 'Nom de la liste d\'activités ',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -54,14 +51,14 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
                   addActivityField();
                 });
               },
-              child: Text('Add Activity'),
+              child: Text('Ajouter une activité'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 createActivityGroup();
               },
-              child: Text('Create Activity Group'),
+              child: Text('Créer la liste d\'activités'),
             ),
           ],
         ),
@@ -102,7 +99,7 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
               child: TextField(
                 controller: nameController,
                 decoration: InputDecoration(
-                  labelText: 'Activity Name',
+                  labelText: 'Nom de l\'activité',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -112,7 +109,7 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
         SizedBox(height: 10),
         Row(
           children: [
-            Text('Student Count: '),
+            const Text('Nombre de participants :'),
             Expanded(
               child: TextField(
                 controller: studentCountController,
@@ -121,7 +118,6 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
                   FilteringTextInputFormatter.digitsOnly
                 ], // Permet uniquement les chiffres
                 decoration: InputDecoration(
-                  labelText: 'Number of Students',
                   border: OutlineInputBorder(),
                 ),
               ),

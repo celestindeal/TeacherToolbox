@@ -41,6 +41,7 @@ class MyApp extends StatelessWidget {
         '/create': (context) => ClassCreationScreen(),
         '/create_Activity': (context) => ActivityCreationScreen(),
         '/EditClassScreen': (context) => ClassCreationScreen(),
+        '/EditActivityScreen': (context) => ClassCreationScreen(),
       },
     );
   }
