@@ -3,8 +3,8 @@
 import 'package:app_teacher_tool_box/models/Sudent.dart';
 
 class StudentGroup {
-  final String name;
-  final List<Student> students;
+  String name;
+  List<Student> students;
 
   //constructeur
   StudentGroup(this.name, this.students);

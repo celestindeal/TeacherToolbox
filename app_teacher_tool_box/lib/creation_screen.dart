@@ -134,7 +134,7 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
     if (students.isNotEmpty) {
       StudentGroup newStudentGroup = StudentGroup(className, students);
       newStudentGroup.logDetails();
-      await LocalDataManager.saveStudentGroupLocally(newStudentGroup);
+      await StudentDataManager.saveStudentGroupLocally(newStudentGroup);
       Navigator.pop(context);
     }
   }

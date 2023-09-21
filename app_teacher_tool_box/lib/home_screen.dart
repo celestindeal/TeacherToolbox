@@ -1,3 +1,4 @@
+import 'package:app_teacher_tool_box/editClassScreen.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/utils/localActivityManager.dart';
 import 'package:app_teacher_tool_box/workshop_screen.dart';
@@ -22,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadData() async {
     List<StudentGroup> loadedStudentGroups =
-        await LocalDataManager.getStudentGroupsLocally();
+        await StudentDataManager.getStudentGroupsLocally();
     List<ActivityGroup> loadedActivityGroups =
         await ActivityDataManager.getActivityGroupsLocally();
 
@@ -115,18 +116,46 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text('Etudiant : $displayNames'),
                         ],
                       ),
-                      trailing: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            LocalDataManager.removeStudentGroupLocally(group);
-                          });
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.red),
-                        ),
-                        child: Text('Supprimer',
-                            style: TextStyle(color: Colors.white)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Code pour l'action de modification ici
+                              // Par exemple, naviguer vers la page de modification avec le groupe d'étudiants
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => EditClassScreen(
+                                    studentGroup: group,
+                                  ),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue),
+                            ),
+                            child: Text('Modifier',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 10), // Espacement entre les boutons
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                StudentDataManager.removeStudentGroupLocally(
+                                    group);
+                                _loadData();
+                              });
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.red),
+                            ),
+                            child: Text('Supprimer',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -174,19 +203,32 @@ class _HomeScreenState extends State<HomeScreen> {
                           Text('Activitée (s) : $displayNames'),
                         ],
                       ),
-                      trailing: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            ActivityDataManager.removeActivityGroupLocally(
-                                group);
-                          });
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.red),
-                        ),
-                        child: Text('Supprimer',
-                            style: TextStyle(color: Colors.white)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Code pour l'action de modification ici
+                              // Par exemple, naviguer vers la page de modification avec le groupe d'étudiants
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.blue),
+                            ),
+                            child: Text('Modifier',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                          SizedBox(width: 10), // Espacement entre les boutons
+                          ElevatedButton(
+                            onPressed: () {},
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.red),
+                            ),
+                            child: Text('Supprimer',
+                                style: TextStyle(color: Colors.white)),
+                          ),
+                        ],
                       ),
                     ),
                   );
