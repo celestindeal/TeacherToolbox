@@ -129,6 +129,18 @@ class _ActivityCreationScreenState extends State<ActivityCreationScreen> {
   }
 
   void createActivityGroup() async {
+    // contrôler que le nom du groupe n'est pas déjà utilisé
+
+    List<String> activityGroupNames =
+        await ActivityDataManager.getAllActivityGroupNamesLocally();
+    if (activityGroupNames.contains(groupName)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Le nom du groupe existe déjà'),
+        ),
+      );
+      return;
+    }
     activities.clear();
     int index = 0;
     for (int i = 0; i < activityFieldsControllers.length; i += 3) {

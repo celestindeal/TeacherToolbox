@@ -114,6 +114,16 @@ class _ClassCreationScreenState extends State<ClassCreationScreen> {
   }
 
   void createStudentGroup() async {
+    List<String> studentGroupNames =
+        await StudentDataManager.getAllStudentGroupNamesLocally();
+    if (studentGroupNames.contains(className)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Le nom de la classe existe déjà'),
+        ),
+      );
+      return;
+    }
     students.clear();
     int index = 0;
     for (var i = 0; i < studentFieldsControllers.length; i += 2) {

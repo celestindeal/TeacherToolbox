@@ -94,4 +94,12 @@ class ActivityDataManager {
       await prefs.setString('activityGroups', jsonEncode(activityGroupsJson));
     }
   }
+
+  static Future<List<String>> getAllActivityGroupNamesLocally() async {
+    List<ActivityGroup> activityGroups =
+        await ActivityDataManager.getActivityGroupsLocally();
+    List<String> activityGroupNames =
+        activityGroups.map((group) => group.name).toList();
+    return activityGroupNames;
+  }
 }

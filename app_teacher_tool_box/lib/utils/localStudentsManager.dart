@@ -68,4 +68,12 @@ class StudentDataManager {
       await prefs.setString('studentGroups', jsonEncode(studentGroupsJson));
     }
   }
+
+  static Future<List<String>> getAllStudentGroupNamesLocally() async {
+    List<StudentGroup> studentGroups =
+        await StudentDataManager.getStudentGroupsLocally();
+    List<String> StudentGroupNames =
+        studentGroups.map((group) => group.name).toList();
+    return StudentGroupNames;
+  }
 }
