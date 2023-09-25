@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
+import 'package:app_teacher_tool_box/utils/localActivityManager.dart';
+import 'package:app_teacher_tool_box/utils/localStudentsManager.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart';
 import 'package:syncfusion_flutter_xlsio/xlsio.dart';
 
 Future<void> generateExcel(List<List<List<int>>> planning,
@@ -63,5 +68,70 @@ Future<void> generateExcel(List<List<List<int>>> planning,
   if (outputFile != null) {
     File file = File(outputFile);
     await file.writeAsBytes(bytes);
+  }
+}
+
+const _allowedExtensions = ['json'];
+const _defaultFileName = 'dataBase.json';
+
+Future<void> export_database() async {
+  try {
+    // Récupérer les données
+    List<ActivityGroup> activityGroups =
+        await ActivityDataManager.getActivityGroupsLocally();
+    List<StudentGroup> studentGroups =
+        await StudentDataManager.getStudentGroupsLocally();
+
+    // Convertir en JSON
+    Map<String, dynamic> dataToExport = {
+      "activityGroups": activityGroups.map((e) => e.toJson()).toList(),
+      "studentGroups": studentGroups.map((e) => e.toJson()).toList(),
+    };
+    String jsonString = jsonEncode(dataToExport);
+
+    // Sauvegarder le fichier
+    String? outputFile = await FilePicker.platform.saveFile(
+      dialogTitle: 'Please select an output file:',
+      allowedExtensions: _allowedExtensions,
+      fileName: _defaultFileName,
+    );
+
+    if (outputFile != null) {
+      File file = File(outputFile);
+      await file.writeAsString(jsonString, encoding: utf8);
+    }
+  } catch (e) {
+    print("An error occurred during export: $e");
+  }
+}
+
+Future<void> import_database() async {
+  try {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: _allowedExtensions,
+    );
+
+    if (result == null)
+      return; // Early exit if the user canceled file selection.
+
+    File file = File(result.files.first.path!);
+    Uint8List fileBytes = await file.readAsBytes();
+    String jsonString = utf8.decode(fileBytes);
+    Map<String, dynamic> importedData = jsonDecode(jsonString);
+
+    // Convertir et sauvegarder les données importées localement
+    List<ActivityGroup> activityGroups =
+        (importedData["activityGroups"] as List)
+            .map((e) => ActivityGroup.fromJson(e))
+            .toList();
+    await ActivityDataManager.saveActivityGroupsLocally(activityGroups);
+
+    List<StudentGroup> studentGroups = (importedData["studentGroups"] as List)
+        .map((e) => StudentGroup.fromJson(e))
+        .toList();
+    await StudentDataManager.saveStudentGroupsLocally(studentGroups);
+  } catch (e) {
+    print("An error occurred during import: $e");
   }
 }

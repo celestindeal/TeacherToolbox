@@ -1,3 +1,4 @@
+import 'package:app_teacher_tool_box/utils/export.dart';
 import 'package:flutter/material.dart';
 import 'package:app_teacher_tool_box/editActivityScreen.dart';
 import 'package:app_teacher_tool_box/editClassScreen.dart';
@@ -177,7 +178,28 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Boite à outils de l\'enseignant')),
+      appBar: AppBar(
+        title: Text('Boite à outils de l\'enseignant'),
+        actions: <Widget>[
+          // Bouton d'importation
+          IconButton(
+            icon:
+                Icon(Icons.upload_rounded), // Icône représentant l'importation.
+            onPressed: () async {
+              await import_database();
+              _loadData();
+            },
+            tooltip: 'Importer les données',
+          ),
+          // Bouton d'exportation
+          const IconButton(
+            icon: Icon(
+                Icons.download_rounded), // Icône représentant l'exportation.
+            onPressed: export_database,
+            tooltip: 'Exporter les données',
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
