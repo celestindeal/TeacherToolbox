@@ -2,7 +2,7 @@ import 'package:app_teacher_tool_box/models/Sudent.dart';
 import 'package:flutter/material.dart';
 import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
-import 'package:app_teacher_tool_box/models/ScheduleGenerator.dart';
+import 'package:app_teacher_tool_box/utils/ScheduleGenerator.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 import 'package:app_teacher_tool_box/utils/export.dart';
 
