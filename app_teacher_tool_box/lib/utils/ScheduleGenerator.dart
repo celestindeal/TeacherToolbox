@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:app_teacher_tool_box/models/Activity.dart';
 import 'package:app_teacher_tool_box/models/ActivityGroup.dart';
+import 'package:app_teacher_tool_box/models/PlanningError.dart';
 import 'package:app_teacher_tool_box/models/StudentGroup.dart';
 import 'package:app_teacher_tool_box/models/Sudent.dart';
 
@@ -21,6 +22,7 @@ class GenerateurEmploiDuTemps {
   // Générer un emploi du temps en utilisant la force brute.
   static List<List<List<int>>> genererForce(
       StudentGroup groupeEtudiants, ActivityGroup groupeActivites) {
+    controleImposibilite(groupeActivites, groupeEtudiants);
     List<List<List<int>>> planning = [[]];
     planning = List.generate(
         groupeActivites.activities.length, (index) => <List<int>>[]);
@@ -50,45 +52,76 @@ class GenerateurEmploiDuTemps {
         nb_tour++;
 
         // Nettoyer la liste d'activités des étudiants et la liste des étudiants dans les activités qui ont été attribuées dans l'état précédent.
-        for (Student etudiant in groupeEtudiants.students) {
-          if (etudiant.activities.length > indexStage)
-            etudiant.activities.removeAt(indexStage);
-        }
-        for (Activity activite in groupeActivites.activities) {
-          planning[activite.id][indexStage].clear();
-        }
+        reinitialiserEtudiantsEtActivites(
+            groupeEtudiants, planning, indexStage, groupeActivites);
 
         // Mélanger la liste des étudiants.
         List<Student> etudiants = List.from(groupeEtudiants.students);
         etudiants.shuffle(Random());
 
-        for (Student etudiant in etudiants) {
-          // Tenter de placer l'étudiant dans une activité.
-          List<Activity> sortedActivities = List.from(
-              groupeActivites.activities)
-            ..sort((a, b) => a.number_students.compareTo(b.number_students));
-
-          for (Activity activite in sortedActivities) {
-            // Contrôler que l'étudiant n'a pas déjà participé à l'activité.
-            // Qu'il reste de la place dans cette activité.
-
-            if (!etudiant.activities.contains(activite) &&
-                !planning[activite.id][indexStage].contains(etudiant.id) &&
-                activite.number_students >
-                    planning[activite.id][indexStage].length) {
-              // Attribuer l'étudiant à l'activité dans l'état actuel.
-              planning[activite.id][indexStage].add(etudiant.id);
-              etudiant.activities.add(activite);
-              nb_sudent_place++;
-              break; // Arrêter après avoir attribué l'étudiant à une activité dans l'état actuel.
-            }
-          }
-        }
+        nb_sudent_place = placerEtudiantsDansActivites(
+            etudiants, groupeActivites, planning, indexStage);
       }
 
       indexStage++;
     }
     return planning;
+  }
+
+  static void reinitialiserEtudiantsEtActivites(
+      StudentGroup groupeEtudiants,
+      List<List<List<int>>> planning,
+      int indexStage,
+      ActivityGroup groupeActivites) {
+    for (var etudiant in groupeEtudiants.students) {
+      if (etudiant.activities.length > indexStage) {
+        etudiant.activities.removeAt(indexStage);
+      }
+    }
+    for (var activite in groupeActivites.activities) {
+      planning[activite.id][indexStage].clear();
+    }
+  }
+
+  static void controleImposibilite(
+      ActivityGroup groupeActivites, StudentGroup groupeEtudiants) {
+    for (var activite in groupeActivites.activities) {
+      if (activite.number_students > groupeEtudiants.students.length) {
+        throw PlanningError(
+            "Le nombre d'étudiants dans l'activité ${activite.name} est supérieur au nombre d'étudiants dans le groupe d'étudiants.");
+      }
+    }
+
+    if (groupeActivites.getNumberOfStudents() <
+        groupeEtudiants.students.length) {
+      throw PlanningError(
+          "Le nombre d'étudiants est supérieur au nombre d'étudiants possible dans les activités.");
+    }
+  }
+
+  static int placerEtudiantsDansActivites(
+      List<Student> etudiants,
+      ActivityGroup groupeActivites,
+      List<List<List<int>>> planning,
+      int indexStage) {
+    int nb_sudent_place = 0;
+    for (var etudiant in etudiants) {
+      var sortedActivities = List.from(groupeActivites.activities)
+        ..sort((a, b) => a.number_students.compareTo(b.number_students));
+
+      for (var activite in sortedActivities) {
+        if (!etudiant.activities.contains(activite) &&
+            !planning[activite.id][indexStage].contains(etudiant.id) &&
+            activite.number_students >
+                planning[activite.id][indexStage].length) {
+          planning[activite.id][indexStage].add(etudiant.id);
+          etudiant.activities.add(activite);
+          nb_sudent_place++;
+          break;
+        }
+      }
+    }
+    return nb_sudent_place;
   }
 
   static bool solutionValide(

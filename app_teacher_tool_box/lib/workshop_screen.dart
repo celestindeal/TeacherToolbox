@@ -1,3 +1,4 @@
+import 'package:app_teacher_tool_box/models/PlanningError.dart';
 import 'package:app_teacher_tool_box/models/Sudent.dart';
 import 'package:flutter/material.dart';
 import 'package:app_teacher_tool_box/models/Activity.dart';
@@ -47,6 +48,24 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
     return maxStates;
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Erreur'),
+        content: Text(message),
+        actions: <Widget>[
+          ElevatedButton(
+            child: Text('Fermer'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   Widget _buildClassSelectionDropdown() {
     return DropdownButton<StudentGroup>(
       value: selectedStudentGroup,
@@ -88,16 +107,25 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
   Widget _buildCreatePlanningButton() {
     return ElevatedButton(
       onPressed: () {
-        if (selectedStudentGroup != studentGroup ||
-            selectedActivityGroup != activityGroup) {
-          studentGroup = selectedStudentGroup;
-          activityGroup = selectedActivityGroup;
-          setState(() {
-            planning = GenerateurEmploiDuTemps.genererForce(
-              studentGroup,
-              activityGroup,
-            );
-          });
+        try {
+          if (selectedStudentGroup != studentGroup ||
+              selectedActivityGroup != activityGroup) {
+            studentGroup = selectedStudentGroup;
+            activityGroup = selectedActivityGroup;
+            setState(() {
+              planning = GenerateurEmploiDuTemps.genererForce(
+                  studentGroup, activityGroup);
+            });
+          }
+        } catch (e) {
+          if (e is PlanningError) {
+            _showErrorDialog(e.message);
+            studentGroup = StudentGroup('name', []);
+            activityGroup = ActivityGroup('name', []);
+          } else {
+            // pour d'autres types d'erreurs
+            _showErrorDialog("Une erreur inattendue s'est produite.");
+          }
         }
       },
       child: const Text('Créer le planning'),

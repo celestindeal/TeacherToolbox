@@ -19,6 +19,14 @@ class ActivityGroup {
     return activities.firstWhere((activity) => activity.id == id);
   }
 
+  int getNumberOfStudents() {
+    int numberOfStudents = 0;
+    for (var activity in activities) {
+      numberOfStudents += activity.number_students;
+    }
+    return numberOfStudents;
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'name': name,
