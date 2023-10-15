@@ -113,7 +113,7 @@ class _WorkshopScreenState extends State<WorkshopScreen> {
             studentGroup = selectedStudentGroup;
             activityGroup = selectedActivityGroup;
             setState(() {
-              planning = GenerateurEmploiDuTemps.genererForce(
+              planning = GenerateurEmploiDuTemps.genererForceBrute(
                   studentGroup, activityGroup);
             });
           }
